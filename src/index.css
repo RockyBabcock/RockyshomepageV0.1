@@ -679,6 +679,99 @@ ul.work-list .list-item .text-wrapper .item-title {
   stroke-dashoffset: 180;
 }
 
+/* ─── MUSAB HASSAN AUTHENTIC FOOTER STYLES ────────────────────────────── */
+.footer-wrapper {
+  width: 100%;
+  background-color: #131314;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(18px, 2.8vh, 32px) clamp(24px, 5vw, 64px);
+  margin-top: clamp(16px, 3.2vh, 36px);
+  box-sizing: border-box;
+}
+
+@media only screen and (max-width: 950px) {
+  .footer-wrapper {
+    flex-direction: column;
+    padding: 24px 20px;
+    margin-top: 24px;
+  }
+  .footer-wrapper .flex-wrapper.decor {
+    margin-top: 22px;
+    align-items: flex-start !important;
+  }
+}
+
+.footer-wrapper .inline-flex {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.footer-wrapper .logo-wrapper {
+  margin-bottom: 1.2vh;
+}
+
+.footer-wrapper .logo-wrapper .logo {
+  display: inline-block;
+  height: clamp(28px, 3.5vh, 36px);
+  width: auto;
+}
+
+.footer-wrapper .status-wrapper .button.large-text {
+  margin-top: 0.8vh;
+}
+
+.footer-wrapper .credits-wrapper {
+  margin-top: 1.8vh;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-wrapper .credits-wrapper p.year {
+  margin-bottom: 0.3vh;
+  font-size: clamp(0.85rem, 1.5vh, 0.95rem);
+  font-weight: normal;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-wrapper .credits-wrapper .credits {
+  font-size: clamp(0.8rem, 1.4vh, 0.9rem);
+  line-height: 135%;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.footer-wrapper .credits-wrapper .credits .button {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.footer-wrapper .large-text {
+  font-size: clamp(1.05rem, 2.1vh, 1.3rem);
+  line-height: 1.45;
+  color: #ffffff;
+}
+
+@media only screen and (max-width: 950px) {
+  .footer-wrapper .large-text br {
+    display: none;
+  }
+}
+
+.footer-wrapper .flex-wrapper.decor {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.footer-wrapper .flex-wrapper.decor .name-signature {
+  width: clamp(130px, 14vh, 180px);
+}
+
 @keyframes scrollArrowLoop {
   0% {
     transform: translateY(-120%);

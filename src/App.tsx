@@ -108,10 +108,17 @@ export default function App() {
 
   const handleNavigate = (targetId: string) => {
     if (!scrollFrameRef.current) return;
+    if (targetId === 'home') {
+      scrollFrameRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+      return;
+    }
     const targetEl = document.getElementById(targetId);
     if (targetEl) {
       scrollFrameRef.current.scrollTo({
-        top: targetEl.offsetTop - window.innerHeight * 0.1,
+        top: targetEl.offsetTop - window.innerHeight * 0.08,
         behavior: 'smooth',
       });
     }
