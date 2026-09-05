@@ -27,10 +27,12 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const imgRefs = useRef<(HTMLImageElement | null)[]>([]);
   const rendererRef = useRef<ImageRenderer | null>(null);
+  const dragDistanceRef = useRef<number>(0);
 
   // Slider physics state strictly mirroring Musab's WorkSlider class
   const sliderState = useRef({
@@ -60,6 +62,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
       return;
     }
 
+    dragDistanceRef.current = 0;
     sliderState.current.initialMouseX = e.clientX;
     sliderState.current.currentMouseX = e.clientX;
     sliderState.current.active = true;
@@ -83,6 +86,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
   // Mouse drag: onMouseMove
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!sliderState.current.active) return;
+    dragDistanceRef.current += Math.abs(e.movementX || 0);
     sliderState.current.currentMouseX = e.clientX;
     const diff =
       (sliderState.current.currentMouseX - sliderState.current.initialMouseX) * -1;
@@ -107,6 +111,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
       return;
     }
 
+    dragDistanceRef.current = 0;
     const clientX = e.touches[0].clientX;
     sliderState.current.initialMouseX = clientX;
     sliderState.current.currentMouseX = clientX;
@@ -126,6 +131,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (!sliderState.current.active) return;
     const clientX = e.touches[0].clientX;
+    dragDistanceRef.current += Math.abs(clientX - sliderState.current.currentMouseX);
     sliderState.current.currentMouseX = clientX;
     const diff =
       (sliderState.current.currentMouseX - sliderState.current.initialMouseX) * -1;
@@ -136,6 +142,26 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
           100
       ) / 100;
   }, []);
+
+  // Wheel horizontal navigation
+  const handleWheel = (e: React.WheelEvent) => {
+    if (currentActive >= 0) return;
+    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (Math.abs(delta) > 2) {
+      sliderState.current.targetPosition -= delta * 1.5;
+    }
+  };
+
+  // Keyboard accessibility: Escape to close details
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && currentActive >= 0) {
+        setCurrentActive(-1);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentActive]);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
@@ -213,7 +239,8 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
     let isCancelled = false;
 
     async function initImageRenderer() {
-      if (!containerRef.current || workData.length === 0) return;
+      const mountContainer = contentWrapperRef.current || containerRef.current;
+      if (!mountContainer || workData.length === 0) return;
 
       try {
         const gpuTier = await getGPUTier();
@@ -223,7 +250,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
         const canRunThree =
           gpuTier.tier >= 2 && !gpuTier.isMobile && (gpuTier.fps ?? 60) >= 30;
 
-        if (canRunThree && containerRef.current) {
+        if (canRunThree && mountContainer) {
           const validImages = imgRefs.current.filter(
             (img): img is HTMLImageElement => Boolean(img && img.src)
           );
@@ -233,7 +260,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
               rendererRef.current.destroy();
             }
             rendererRef.current = new ImageRenderer(
-              containerRef.current,
+              mountContainer,
               validImages,
               () => sliderState.current.speed
             );
@@ -263,6 +290,7 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
       ref={containerRef}
     >
       <div
+        ref={contentWrapperRef}
         className={`content-wrapper ${isDragging ? 'is-dragging' : ''} ${
           currentActive >= 0 ? 'disabled' : ''
         }`}
@@ -270,6 +298,8 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
         tabIndex={0}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
+        onWheel={handleWheel}
+        onMouseLeave={handleMouseUp}
       >
         <div className="w-full h-full overflow-x-hidden">
           <ul
@@ -290,6 +320,11 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
                     className={`list-item clickable passive ${
                       isActive ? 'active' : ''
                     } ${isAmbient ? 'ambient' : ''}`}
+                    onClick={() => {
+                      if (!isDragging && dragDistanceRef.current < 6) {
+                        toggleActiveItem(i);
+                      }
+                    }}
                   >
                     {/* Image Wrapper */}
                     <div className="img-wrapper">
@@ -326,7 +361,10 @@ export const WorkSection: React.FC<WorkSectionProps> = ({
                         <button
                           type="button"
                           className="button item-link interactive"
-                          onClick={() => toggleActiveItem(i)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleActiveItem(i);
+                          }}
                         >
                           view
                         </button>

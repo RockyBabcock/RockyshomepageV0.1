@@ -87,5 +87,44 @@
             "Web Designer",
             "Front-End Web Developer"
         ]
+    },
+    {
+        "id": "aurora",
+        "title": "Aurora Spatial",
+        "details": {
+            "description": "An experimental spatial audio and WebGL shader exhibition demonstrating volumetric light scattering, generative terrain synthesis, and fluid interaction physics.",
+            "summary": "Creative Experiment"
+        },
+        "roles": [
+            "Creative Technologist",
+            "WebGL Developer",
+            "3D Artist"
+        ],
+        "links": [
+            {
+                "type": "web",
+                "text": "Explore Project",
+                "link": "https://aurora.musabhassan.com"
+            }
+        ]
+    },
+    {
+        "id": "chronos",
+        "title": "Chronos Studio",
+        "details": {
+            "description": "A high-performance algorithmic design tool and typographic playground built for generative brand systems, motion design tokens, and real-time SVG vector pipelines.",
+            "summary": "Design Tool"
+        },
+        "roles": [
+            "Product Designer",
+            "Full-Stack Developer"
+        ],
+        "links": [
+            {
+                "type": "web",
+                "text": "Visit Studio",
+                "link": "https://chronos.musabhassan.com"
+            }
+        ]
     }
 ]

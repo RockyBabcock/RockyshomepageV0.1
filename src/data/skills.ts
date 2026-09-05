@@ -71,6 +71,18 @@ export const PROJECT_NAMES: Record<
     category: 'WebGL Creative Engine',
     image: '/assets/imgs/work-back/spatial/cover.jpg',
   },
+  aurora: {
+    title: 'Aurora Spatial',
+    number: '06',
+    category: 'Creative WebGL Experiment',
+    image: '/assets/imgs/work-back/aurora/cover.jpg',
+  },
+  chronos: {
+    title: 'Chronos Studio',
+    number: '07',
+    category: 'Algorithmic Design Tool',
+    image: '/assets/imgs/work-back/chronos/cover.jpg',
+  },
 };
 
 /**
