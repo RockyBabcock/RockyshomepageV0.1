@@ -156,7 +156,7 @@ export default function App() {
       >
         <Navbar onNavigate={handleNavigate} />
 
-        <HomeSection scrollY={scrollY} />
+        <HomeSection scrollY={scrollY} onNavigate={handleNavigate} />
 
         <WorkSection
           workData={workData}
