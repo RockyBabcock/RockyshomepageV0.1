@@ -5,40 +5,88 @@ import * as random from 'maath/random';
 import type { Points as PointsType } from 'three';
 import { isWebGLAvailable } from '../utils';
 
-interface ParticleBackgroundProps {
+export interface ParticleBackgroundProps {
   scrollY?: number;
+  className?: string;
 }
 
 /**
- * StarBackground - Strictly from sanidhyy/space-portfolio
- * Uses Three.js PointMaterial + Points + maath/random inSphere
+ * StarBackground - Multi-depth layered celestial particle field
+ * Uses 3 distinct particle scales/opacities for subtle, physical depth:
+ * - Many tiny low-alpha ambient stars (background depth, 3900 points)
+ * - Medium particles with soft luminance (mid-depth, 950 points)
+ * - Sparkling micro-stars creating gentle spatial sparkle (150 points)
+ * Total: 5000 particles with tuned ethereal transparencies to avoid harsh brightness.
  */
 export const StarBackground: React.FC = (props) => {
-  const ref = useRef<PointsType | null>(null);
-  const [sphere] = useState(() =>
-    random.inSphere(new Float32Array(5000), { radius: 1.2 }) as Float32Array
+  const refTiny = useRef<PointsType | null>(null);
+  const refMed = useRef<PointsType | null>(null);
+  const refBright = useRef<PointsType | null>(null);
+
+  // 1. Layer 1: Many tiny low-alpha stars (3900 points)
+  const [sphereTiny] = useState(() =>
+    random.inSphere(new Float32Array(3900 * 3), { radius: 1.25 }) as Float32Array
+  );
+
+  // 2. Layer 2: Medium particles with soft pastel lilac/white presence (950 points)
+  const [sphereMed] = useState(() =>
+    random.inSphere(new Float32Array(950 * 3), { radius: 1.15 }) as Float32Array
+  );
+
+  // 3. Layer 3: Sparkling micro-stars creating depth (150 points)
+  const [sphereBright] = useState(() =>
+    random.inSphere(new Float32Array(150 * 3), { radius: 1.05 }) as Float32Array
   );
 
   useFrame((_state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.x -= delta / 10;
-      ref.current.rotation.y -= delta / 15;
+    // Gentle continuous movement with subtle rotational parallax between layers
+    if (refTiny.current) {
+      refTiny.current.rotation.x -= delta / 34;
+      refTiny.current.rotation.y -= delta / 44;
+    }
+    if (refMed.current) {
+      refMed.current.rotation.x -= delta / 24;
+      refMed.current.rotation.y -= delta / 32;
+    }
+    if (refBright.current) {
+      refBright.current.rotation.x -= delta / 18;
+      refBright.current.rotation.y -= delta / 24;
     }
   });
 
   return (
     <group rotation={[0, 0, Math.PI / 4]}>
-      <Points
-        ref={ref}
-        stride={3}
-        positions={sphere}
-        frustumCulled
-        {...props}
-      >
+      {/* 1. Many tiny low-alpha background stars */}
+      <Points ref={refTiny} stride={3} positions={sphereTiny} frustumCulled {...props}>
         <PointMaterial
           transparent
-          color="#fff"
-          size={0.002}
+          color="#e2e8f0"
+          size={0.0014}
+          opacity={0.28}
+          sizeAttenuation
+          depthWrite={false}
+        />
+      </Points>
+
+      {/* 2. Medium particles with soft gentle glow */}
+      <Points ref={refMed} stride={3} positions={sphereMed} frustumCulled {...props}>
+        <PointMaterial
+          transparent
+          color="#f8fafc"
+          size={0.0026}
+          opacity={0.48}
+          sizeAttenuation
+          depthWrite={false}
+        />
+      </Points>
+
+      {/* 3. Micro-stars creating delicate depth sparkle without harsh glare */}
+      <Points ref={refBright} stride={3} positions={sphereBright} frustumCulled {...props}>
+        <PointMaterial
+          transparent
+          color="#ffffff"
+          size={0.0042}
+          opacity={0.72}
           sizeAttenuation
           depthWrite={false}
         />
@@ -49,8 +97,7 @@ export const StarBackground: React.FC = (props) => {
 
 /**
  * Fallback 2D Canvas Starfield
- * Faithfully replicates the exact sanidhyy/space-portfolio rotational math & starfield
- * when WebGL is disabled in the browser environment.
+ * Replicates the multi-scale depth particle field when WebGL is unavailable.
  */
 const StarBackground2D: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -72,26 +119,28 @@ const StarBackground2D: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
 
-    // Exact same inSphere algorithm from maath/random with 3000 points
-    const pointCount = 3000;
-    const positions = random.inSphere(new Float32Array(pointCount * 3), {
-      radius: 1.2,
-    }) as Float32Array;
+    // Multi-scale point clouds matching 5000 points
+    const countTiny = 3900;
+    const countMed = 950;
+    const countBright = 150;
 
-    let rotX = 0;
-    let rotY = 0;
+    const posTiny = random.inSphere(new Float32Array(countTiny * 3), { radius: 1.25 }) as Float32Array;
+    const posMed = random.inSphere(new Float32Array(countMed * 3), { radius: 1.15 }) as Float32Array;
+    const posBright = random.inSphere(new Float32Array(countBright * 3), { radius: 1.05 }) as Float32Array;
+
+    let rotX1 = 0, rotY1 = 0;
+    let rotX2 = 0, rotY2 = 0;
+    let rotX3 = 0, rotY3 = 0;
     let lastTime = performance.now();
-    const SQRT2_2 = Math.SQRT1_2; // cos(PI/4) = sin(PI/4)
+    const SQRT2_2 = Math.SQRT1_2;
 
-    const render = (time: number) => {
-      const delta = Math.min((time - lastTime) / 1000, 0.1);
-      lastTime = time;
-
-      rotX -= delta / 10;
-      rotY -= delta / 15;
-
-      ctx.clearRect(0, 0, width, height);
-
+    const renderPoints = (
+      positions: Float32Array,
+      rotX: number,
+      rotY: number,
+      baseAlpha: number,
+      size: number
+    ) => {
       const cx = width / 2;
       const cy = height / 2;
       const cosX = Math.cos(rotX);
@@ -105,22 +154,22 @@ const StarBackground2D: React.FC = () => {
         const y0 = positions[i + 1];
         const z0 = positions[i + 2];
 
-        // 1. Rotate around Z by PI/4 (group rotation)
+        // 1. Group rotation Z by PI/4
         const x1 = (x0 - y0) * SQRT2_2;
         const y1 = (x0 + y0) * SQRT2_2;
         const z1 = z0;
 
-        // 2. Rotate around X by rotX
+        // 2. Rotate around X
         const x2 = x1;
         const y2 = y1 * cosX - z1 * sinX;
         const z2 = y1 * sinX + z1 * cosX;
 
-        // 3. Rotate around Y by rotY
+        // 3. Rotate around Y
         const x3 = x2 * cosY + z2 * sinY;
         const y3 = y2;
         const z3 = -x2 * sinY + z2 * cosY;
 
-        // 4. Perspective projection with camera at [0, 0, 1]
+        // 4. Perspective projection
         const dist = 1.0 - z3;
         if (dist <= 0.1) continue;
 
@@ -130,11 +179,29 @@ const StarBackground2D: React.FC = () => {
 
         if (px < 0 || px >= width || py < 0 || py >= height) continue;
 
-        const alpha = Math.max(0.2, Math.min(1.0, 1.2 / dist));
+        const alpha = Math.max(0.06, Math.min(0.85, (baseAlpha * 0.95) / dist));
         ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
-        const size = dist < 1.0 ? 1.5 : 1.0;
         ctx.fillRect(px, py, size, size);
       }
+    };
+
+    const render = (time: number) => {
+      const delta = Math.min((time - lastTime) / 1000, 0.1);
+      lastTime = time;
+
+      rotX1 -= delta / 34;
+      rotY1 -= delta / 44;
+      rotX2 -= delta / 24;
+      rotY2 -= delta / 32;
+      rotX3 -= delta / 18;
+      rotY3 -= delta / 24;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Render 3 depth layers with balanced, soft transparencies
+      renderPoints(posTiny, rotX1, rotY1, 0.26, 0.9);
+      renderPoints(posMed, rotX2, rotY2, 0.46, 1.4);
+      renderPoints(posBright, rotX3, rotY3, 0.70, 2.0);
 
       animId = requestAnimationFrame(render);
     };
@@ -179,7 +246,9 @@ class WebGLErrorBoundary extends React.Component<
   }
 }
 
-export const ParticleBackground: React.FC<ParticleBackgroundProps> = () => {
+export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({
+  className = 'w-full h-auto fixed inset-0 z-[2] pointer-events-none',
+}) => {
   const [canUseWebGL, setCanUseWebGL] = useState<boolean>(() => isWebGLAvailable());
 
   useEffect(() => {
@@ -187,7 +256,7 @@ export const ParticleBackground: React.FC<ParticleBackgroundProps> = () => {
   }, []);
 
   return (
-    <div className="w-full h-auto fixed inset-0 z-0 pointer-events-none">
+    <div className={className}>
       {canUseWebGL ? (
         <WebGLErrorBoundary fallback={<StarBackground2D />}>
           <Canvas

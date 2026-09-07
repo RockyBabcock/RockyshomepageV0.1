@@ -169,42 +169,58 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ scrollY, onNavigate })
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          LAYER 2: CELESTIAL PURPLE NEBULA & BLACK HOLE ACCRETION PORTAL
-          Refined in direct response to user requirements:
-          1. '紫色星云亮度略微低一点': Softened luminance, ethereal opacity (~75%),
-             and balanced contrast to integrate harmoniously with the watercolor sky.
-          2. '同时向上升高位置': Elevated into the upper sky above 'rocky', so the
-             concentric rainbow arc, horizon flare, and black hole crown the typography
-             without smothering the text letters.
+          LAYER 2: ATMOSPHERIC NEBULA & RADIANT CENTER HALO
+          Multi-layer transparent compositing matching reference visual target:
+          - Broad low-frequency outer haze in upper-middle sky (extremely subtle)
+          - Mid haze diffusion in pastel lavender/lilac/blue
+          - Soft radiant center halo (pale white/lilac core fading into watercolor)
+          - Upright celestial accretion arc (blackhole.webm) with zero hard edges
+          - Soft bloom-like horizon lens flare
+          No hard edges, no opaque dark space, no color cast over the flowers.
          ───────────────────────────────────────────────────────────── */}
       <div
-        className="absolute left-1/2 pointer-events-none select-none z-[2] flex flex-col items-center justify-center overflow-visible mix-blend-screen"
+        className="absolute left-1/2 pointer-events-none select-none z-[3] flex flex-col items-center justify-center overflow-visible mix-blend-screen"
         style={{
-          top: '22%',
+          top: '24%',
           transform: 'translate(-50%, -50%)',
-          width: 'clamp(340px, 52vw, 680px)',
-          height: 'clamp(260px, 40vw, 500px)',
+          width: 'clamp(380px, 60vw, 760px)',
+          height: 'clamp(280px, 44vw, 540px)',
         }}
         aria-hidden="true"
       >
-        {/* Soft Ambient Cosmic Purple Halo with lowered brightness */}
+        {/* 1. Broad Low-Frequency Outer Haze (gentle pastel lavender & blue atmospheric glow) */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            width: '150%',
+            height: '130%',
+            left: '50%',
+            top: '48%',
+            transform: 'translate(-50%, -50%)',
+            background:
+              'radial-gradient(ellipse 80% 65% at 50% 48%, rgba(167, 139, 250, 0.09) 0%, rgba(139, 92, 246, 0.05) 36%, rgba(147, 197, 253, 0.02) 62%, transparent 82%)',
+            filter: 'blur(54px)',
+          }}
+        />
+
+        {/* 2. Mid Haze & Center Halo (soft, low-luminance bloom seamlessly merging into watercolor) */}
         <div
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(168, 85, 247, 0.22) 0%, rgba(126, 34, 206, 0.12) 44%, rgba(79, 70, 229, 0.04) 68%, transparent 88%)',
+              'radial-gradient(ellipse 65% 55% at 50% 50%, rgba(255, 255, 255, 0.22) 0%, rgba(233, 213, 255, 0.14) 28%, rgba(196, 181, 253, 0.07) 50%, transparent 80%)',
             filter: 'blur(32px)',
           }}
         />
 
-        {/* Black Hole Upright Video masked in celestial arched portal */}
+        {/* 3. Celestial Accretion Arcs (blackhole.webm) with soft, toned-down luminance */}
         <div
           className="relative w-full h-full flex items-center justify-center overflow-hidden"
           style={{
             maskImage:
-              'radial-gradient(ellipse 90% 82% at 50% 52%, black 48%, rgba(0,0,0,0.6) 72%, transparent 100%)',
+              'radial-gradient(ellipse 88% 80% at 50% 50%, black 40%, rgba(0,0,0,0.62) 68%, transparent 96%)',
             WebkitMaskImage:
-              'radial-gradient(ellipse 90% 82% at 50% 52%, black 48%, rgba(0,0,0,0.6) 72%, transparent 100%)',
+              'radial-gradient(ellipse 88% 80% at 50% 50%, black 40%, rgba(0,0,0,0.62) 68%, transparent 96%)',
           }}
         >
           <video
@@ -213,26 +229,26 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ scrollY, onNavigate })
             muted
             loop
             playsInline
-            className="w-[125%] h-[125%] max-w-none object-cover select-none pointer-events-none opacity-75"
+            className="w-[125%] h-[125%] max-w-none object-cover select-none pointer-events-none opacity-45"
             style={{
               objectPosition: 'center 46%',
-              filter: 'brightness(0.86) contrast(1.12)',
+              filter: 'brightness(0.76) contrast(1.05)',
             }}
             src="/videos/blackhole.webm"
           />
         </div>
 
-        {/* Luminous horizontal radiant lens flare beam across the black hole horizon */}
+        {/* 4. Delicate Horizontal Radiant Horizon Flare Beam with subtle, non-glaring bloom */}
         <div
-          className="absolute w-[180%] max-w-[1400px] h-[2px] sm:h-[3px] pointer-events-none"
+          className="absolute w-[180%] max-w-[1200px] h-[1.5px] sm:h-[2px] pointer-events-none"
           style={{
             left: '50%',
             top: '51%',
             transform: 'translate(-50%, -50%)',
             background:
-              'linear-gradient(90deg, transparent 0%, rgba(168, 85, 247, 0.12) 15%, rgba(216, 180, 254, 0.72) 36%, rgba(255, 255, 255, 0.92) 50%, rgba(216, 180, 254, 0.72) 64%, rgba(168, 85, 247, 0.12) 85%, transparent 100%)',
+              'linear-gradient(90deg, transparent 0%, rgba(167, 139, 250, 0.06) 18%, rgba(216, 180, 254, 0.45) 38%, rgba(255, 255, 255, 0.65) 50%, rgba(216, 180, 254, 0.45) 62%, rgba(167, 139, 250, 0.06) 82%, transparent 100%)',
             boxShadow:
-              '0 0 14px 3px rgba(168, 85, 247, 0.38), 0 0 32px 8px rgba(129, 140, 248, 0.2)',
+              '0 0 10px 2px rgba(167, 139, 250, 0.20), 0 0 20px 4px rgba(196, 181, 253, 0.10)',
           }}
         />
       </div>

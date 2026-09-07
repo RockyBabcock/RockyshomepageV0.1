@@ -172,9 +172,6 @@ export default function App() {
       {/* Intro progress bar loader */}
       {loading && <Loader progress={progress} loadingDone={loadingDone} />}
 
-      {/* Atmospheric 3D Starfield & Spatial Depth Layer (Layer 0) */}
-      <ParticleBackground scrollY={scrollY} />
-
       {/* Main scrolling viewport container */}
       <div
         id="scroll-frame"
@@ -184,6 +181,9 @@ export default function App() {
         style={{ overflowY: loading ? 'hidden' : 'auto' }}
       >
         <Navbar onNavigate={handleNavigate} activeSection={activeSection} />
+
+        {/* Atmospheric 3D Starfield & Spatial Depth Layer (Layer 2 depth across hero & sections) */}
+        <ParticleBackground scrollY={scrollY} />
 
         <HomeSection scrollY={scrollY} onNavigate={handleNavigate} />
 
