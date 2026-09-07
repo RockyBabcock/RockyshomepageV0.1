@@ -73,7 +73,8 @@ export default function App() {
         if (!isMounted) return;
         setProgress(100);
 
-        // Finish loader transition
+        // Finish loader transition:
+        // Wait 250ms -> setLoadingDone(true) triggers right: 0; width: 0 (800ms wipe) -> 700ms overlay fade
         setTimeout(() => {
           if (!isMounted) return;
           setLoadingDone(true);
@@ -81,8 +82,8 @@ export default function App() {
             if (!isMounted) return;
             setLoading(false);
             devMsg();
-          }, 800);
-        }, 400);
+          }, 1550);
+        }, 250);
       } catch (err) {
         console.error('Failed to load portfolio:', err);
         if (isMounted) {
@@ -100,10 +101,31 @@ export default function App() {
     };
   }, []);
 
-  // Handle scroll events on scroll frame
+  const [activeSection, setActiveSection] = useState<string>('home');
+
+  // Handle scroll events and track active section dynamically
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
-    setScrollY(target.scrollTop);
+    const scrollPos = target.scrollTop;
+    setScrollY(scrollPos);
+
+    const windowH = window.innerHeight;
+    const sections = [
+      { id: 'footer', el: document.getElementById('footer') },
+      { id: 'skills', el: document.getElementById('skills') },
+      { id: 'work', el: document.getElementById('work') },
+      { id: 'home', el: document.getElementById('home') },
+    ];
+
+    for (const sec of sections) {
+      if (sec.el) {
+        const top = sec.el.offsetTop - windowH * 0.25;
+        if (scrollPos >= top) {
+          setActiveSection(sec.id);
+          break;
+        }
+      }
+    }
   };
 
   const handleNavigate = (targetId: string) => {
@@ -113,16 +135,21 @@ export default function App() {
         top: 0,
         behavior: 'smooth',
       });
+      setActiveSection('home');
       return;
     }
     const resolvedId =
       targetId === 'studio' ? 'work' : targetId === 'contact' ? 'footer' : targetId;
     const targetEl = document.getElementById(resolvedId);
     if (targetEl) {
+      // Smooth momentum scrolling with header offset of offsetTop - 10vh
+      const headerOffset10vh = window.innerHeight * 0.1;
+      const targetY = Math.max(0, targetEl.offsetTop - headerOffset10vh);
       scrollFrameRef.current.scrollTo({
-        top: targetEl.offsetTop - window.innerHeight * 0.08,
+        top: targetY,
         behavior: 'smooth',
       });
+      setActiveSection(resolvedId);
     }
   };
 
@@ -145,10 +172,10 @@ export default function App() {
       {/* Intro progress bar loader */}
       {loading && <Loader progress={progress} loadingDone={loadingDone} />}
 
-      {/* Atmospheric 3D Starfield & Spatial Depth Layer */}
+      {/* Atmospheric 3D Starfield & Spatial Depth Layer (Layer 0) */}
       <ParticleBackground scrollY={scrollY} />
 
-      {/* Main scrolling viewport container (Layer 2: Content Layer at z-10) */}
+      {/* Main scrolling viewport container */}
       <div
         id="scroll-frame"
         ref={scrollFrameRef}
@@ -156,7 +183,7 @@ export default function App() {
         className="w-full h-screen relative z-10 overflow-x-hidden overflow-y-auto"
         style={{ overflowY: loading ? 'hidden' : 'auto' }}
       >
-        <Navbar onNavigate={handleNavigate} />
+        <Navbar onNavigate={handleNavigate} activeSection={activeSection} />
 
         <HomeSection scrollY={scrollY} onNavigate={handleNavigate} />
 

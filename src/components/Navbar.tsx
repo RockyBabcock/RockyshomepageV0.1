@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 interface NavbarProps {
   onNavigate: (targetId: string) => void;
+  activeSection?: string;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onNavigate, activeSection = 'home' }) => {
   const [mobileMenuActive, setMobileMenuActive] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -24,6 +25,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
     setMobileMenuActive(false);
     onNavigate(targetId);
   };
+
+  const isHomeActive = activeSection === 'home';
+  const isStudioActive = activeSection === 'work' || activeSection === 'studio';
+  const isSkillsActive = activeSection === 'skills';
+  const isContactActive = activeSection === 'footer' || activeSection === 'contact';
 
   return (
     <nav className="fixed top-4 sm:top-6 left-0 w-full z-[100] px-6 sm:px-10 md:px-14 flex flex-row justify-between items-center box-border pointer-events-none transition-all duration-300">
@@ -45,52 +51,68 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
 
       {/* Desktop & Mobile Menu */}
       <div className="flex items-center pointer-events-auto">
-        {/* Desktop Menu - Refined typography matching the digital museum aesthetic */}
-        <ul className="hidden md:flex list-none mix-blend-exclusion overflow-hidden m-0 p-0 items-center gap-1">
+        {/* Desktop Menu - Refined typography matching rockybabcock.com */}
+        <ul className="hidden md:flex list-none mix-blend-exclusion overflow-hidden m-0 p-0 items-center gap-6 lg:gap-8">
           <li className="font-mono uppercase text-xs tracking-[0.2em] inline-flex items-center">
             <button
               onClick={() => handleNavClick('home')}
-              className="border-none bg-transparent text-white/90 uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable hover:text-white transition-colors"
+              className={`border-none bg-transparent uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable transition-all duration-300 relative py-1 px-1 ${
+                isHomeActive ? 'text-white font-semibold drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]' : 'text-white/80 hover:text-white'
+              }`}
             >
               HOME
+              {isHomeActive && (
+                <span className="absolute bottom-0 left-1 right-1 h-[1.5px] bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.95)] animate-pulse" />
+              )}
             </button>
-            <span className="mx-2 text-white/40">·</span>
           </li>
           <li className="font-mono uppercase text-xs tracking-[0.2em] inline-flex items-center">
             <button
               onClick={() => handleNavClick('work')}
-              className="border-none bg-transparent text-white/90 uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable hover:text-white transition-colors"
+              className={`border-none bg-transparent uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable transition-all duration-300 relative py-1 px-1 ${
+                isStudioActive ? 'text-white font-semibold drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]' : 'text-white/80 hover:text-white'
+              }`}
             >
               STUDIO
+              {isStudioActive && (
+                <span className="absolute bottom-0 left-1 right-1 h-[1.5px] bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.95)] animate-pulse" />
+              )}
             </button>
-            <span className="mx-2 text-white/40">·</span>
           </li>
           <li className="font-mono uppercase text-xs tracking-[0.2em] inline-flex items-center">
             <button
               onClick={() => handleNavClick('skills')}
-              className="border-none bg-transparent text-white/90 uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable hover:text-white transition-colors"
+              className={`border-none bg-transparent uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable transition-all duration-300 relative py-1 px-1 ${
+                isSkillsActive ? 'text-white font-semibold drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]' : 'text-white/80 hover:text-white'
+              }`}
             >
               SKILLS
+              {isSkillsActive && (
+                <span className="absolute bottom-0 left-1 right-1 h-[1.5px] bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.95)] animate-pulse" />
+              )}
             </button>
-            <span className="mx-2 text-white/40">·</span>
           </li>
           <li className="font-mono uppercase text-xs tracking-[0.2em] inline-flex items-center">
             <a
               href="mailto:holmepavolini@gmail.com"
-              className="text-white/90 uppercase font-inherit text-inherit tracking-inherit no-underline clickable hover:text-white transition-colors"
+              className={`uppercase font-inherit text-inherit tracking-inherit no-underline clickable transition-all duration-300 relative py-1 px-1 ${
+                isContactActive ? 'text-white font-semibold drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]' : 'text-white/80 hover:text-white'
+              }`}
             >
               CONTACT
+              {isContactActive && (
+                <span className="absolute bottom-0 left-1 right-1 h-[1.5px] bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.95)] animate-pulse" />
+              )}
             </a>
-            <span className="mx-2 text-white/40">·</span>
           </li>
           <li className="font-mono uppercase text-xs tracking-[0.2em] inline-flex items-center">
             <a
               href="https://github.com/RockyBabcock/Rockyshomepage"
               target="_blank"
               rel="noreferrer"
-              className="text-white/90 uppercase font-inherit text-inherit tracking-inherit no-underline clickable hover:text-white transition-colors"
+              className="text-white/80 uppercase font-inherit text-inherit tracking-inherit no-underline clickable hover:text-white transition-colors py-1 px-1"
             >
-              GIT
+              GITHUB
             </a>
           </li>
         </ul>
@@ -130,34 +152,42 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
         }`}
       >
         <ul className="list-none flex flex-col justify-center w-full m-0 p-0">
-          <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/30">
+          <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/20">
             <button
               onClick={() => handleNavClick('home')}
-              className="border-none bg-transparent text-white font-inherit text-inherit cursor-pointer text-left w-full clickable"
+              className={`border-none bg-transparent font-inherit text-inherit cursor-pointer text-left w-full clickable transition-all ${
+                isHomeActive ? 'text-white font-extrabold pl-2 border-l-2 border-white drop-shadow-[0_0_12px_rgba(255,255,255,0.9)] animate-pulse' : 'text-white/60'
+              }`}
             >
               home
             </button>
           </li>
-          <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/30">
+          <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/20">
             <button
               onClick={() => handleNavClick('work')}
-              className="border-none bg-transparent text-white font-inherit text-inherit cursor-pointer text-left w-full clickable"
+              className={`border-none bg-transparent font-inherit text-inherit cursor-pointer text-left w-full clickable transition-all ${
+                isStudioActive ? 'text-white font-extrabold pl-2 border-l-2 border-white drop-shadow-[0_0_12px_rgba(255,255,255,0.9)] animate-pulse' : 'text-white/60'
+              }`}
             >
               studio
             </button>
           </li>
-          <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/30">
+          <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/20">
             <button
               onClick={() => handleNavClick('skills')}
-              className="border-none bg-transparent text-white font-inherit text-inherit cursor-pointer text-left w-full clickable"
+              className={`border-none bg-transparent font-inherit text-inherit cursor-pointer text-left w-full clickable transition-all ${
+                isSkillsActive ? 'text-white font-extrabold pl-2 border-l-2 border-white drop-shadow-[0_0_12px_rgba(255,255,255,0.9)] animate-pulse' : 'text-white/60'
+              }`}
             >
               skills
             </button>
           </li>
-          <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/30">
+          <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/20">
             <a
               href="mailto:holmepavolini@gmail.com"
-              className="text-white no-underline font-inherit text-inherit block w-full clickable"
+              className={`no-underline font-inherit text-inherit block w-full clickable transition-all ${
+                isContactActive ? 'text-white font-extrabold pl-2 border-l-2 border-white drop-shadow-[0_0_12px_rgba(255,255,255,0.9)] animate-pulse' : 'text-white/60'
+              }`}
             >
               contact
             </a>
@@ -167,7 +197,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
               href="https://github.com/RockyBabcock/Rockyshomepage"
               target="_blank"
               rel="noreferrer"
-              className="text-white no-underline font-inherit text-inherit block w-full clickable"
+              className="text-white/60 no-underline font-inherit text-inherit block w-full clickable hover:text-white transition-colors"
             >
               git
             </a>

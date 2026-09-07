@@ -33,7 +33,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ scrollY, onNavigate })
       }
       if (signatureRef.current) {
         signatureRef.current.style.opacity = '1';
-        signatureRef.current.style.transform = 'translateY(-50%)';
+        signatureRef.current.style.transform = 'none';
       }
       if (occRef.current) {
         occRef.current.style.opacity = '1';
@@ -46,61 +46,74 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ scrollY, onNavigate })
       return;
     }
 
-    // Set initial animation state
+    // Set initial animation state with Musab Hassan's masked reveal coordinates:
+    // transform: translate3d(0, 130%, 0) rotate(7deg) -> translate3d(0, 0%, 0) rotate(0deg)
     const words = [word1Ref.current, word2Ref.current];
     words.forEach((el) => {
       if (!el) return;
-      el.style.transform = 'translateY(115%) rotate(4deg)';
+      el.style.transform = 'translate3d(0, 130%, 0) rotate(7deg)';
       el.style.opacity = '0';
       el.style.transition =
-        'transform 1.1s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.9s ease';
+        'transform 1.25s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.85s ease';
     });
 
     if (signatureRef.current) {
       signatureRef.current.style.opacity = '0';
-      signatureRef.current.style.transform = 'translateY(-50%) scale(0.92)';
+      signatureRef.current.style.transform = 'translate3d(0, 16px, 0) scale(0.96) rotate(-4deg)';
       signatureRef.current.style.transition =
-        'opacity 1.2s ease 0.6s, transform 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) 0.6s';
+        'opacity 1.2s ease 0.45s, transform 1.2s cubic-bezier(0.165, 0.84, 0.44, 1) 0.45s';
     }
 
     if (occRef.current) {
       occRef.current.style.opacity = '0';
-      occRef.current.style.transform = 'translateY(20px)';
+      occRef.current.style.transform = 'translate3d(0, 20px, 0)';
       occRef.current.style.transition =
-        'opacity 0.9s ease 0.75s, transform 0.9s cubic-bezier(0.165, 0.84, 0.44, 1) 0.75s';
+        'opacity 0.9s ease 0.65s, transform 0.9s cubic-bezier(0.165, 0.84, 0.44, 1) 0.65s';
     }
 
     if (scrollCtaRef.current) {
       scrollCtaRef.current.style.opacity = '0';
-      scrollCtaRef.current.style.transform = 'translateY(20px)';
+      scrollCtaRef.current.style.transform = 'translate3d(0, 20px, 0)';
       scrollCtaRef.current.style.transition =
-        'opacity 0.9s ease 0.9s, transform 0.9s cubic-bezier(0.165, 0.84, 0.44, 1) 0.9s';
+        'opacity 0.9s ease 0.8s, transform 0.9s cubic-bezier(0.165, 0.84, 0.44, 1) 0.8s';
     }
 
-    // Trigger entrance animation with RAF
+    // Trigger staggered entrance animation
     const rafId = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        words.forEach((el, idx) => {
-          if (!el) return;
+        if (word1Ref.current) {
           setTimeout(() => {
-            el.style.transform = 'translateY(0%) rotate(0deg)';
-            el.style.opacity = '1';
-          }, 200 + idx * 120);
-        });
+            word1Ref.current!.style.transform = 'translate3d(0, 0%, 0) rotate(0deg)';
+            word1Ref.current!.style.opacity = '1';
+          }, 200);
+        }
+
+        if (word2Ref.current) {
+          setTimeout(() => {
+            word2Ref.current!.style.transform = 'translate3d(0, 0%, 0) rotate(0deg)';
+            word2Ref.current!.style.opacity = '1';
+          }, 340);
+        }
 
         if (signatureRef.current) {
-          signatureRef.current.style.opacity = '1';
-          signatureRef.current.style.transform = 'translateY(-50%) scale(1)';
+          setTimeout(() => {
+            signatureRef.current!.style.opacity = '1';
+            signatureRef.current!.style.transform = 'translate3d(0, 0, 0) scale(1) rotate(-4deg)';
+          }, 460);
         }
 
         if (occRef.current) {
-          occRef.current.style.opacity = '1';
-          occRef.current.style.transform = 'translateY(0)';
+          setTimeout(() => {
+            occRef.current!.style.opacity = '1';
+            occRef.current!.style.transform = 'translate3d(0, 0, 0)';
+          }, 650);
         }
 
         if (scrollCtaRef.current) {
-          scrollCtaRef.current.style.opacity = '1';
-          scrollCtaRef.current.style.transform = 'translateY(0)';
+          setTimeout(() => {
+            scrollCtaRef.current!.style.opacity = '1';
+            scrollCtaRef.current!.style.transform = 'translate3d(0, 0, 0)';
+          }, 800);
         }
       });
     });
@@ -108,8 +121,8 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ scrollY, onNavigate })
     return () => cancelAnimationFrame(rafId);
   }, []);
 
-  // Parallax translation (GPU accelerated translate3d)
-  const parallaxOffsetY = scrollY * 0.16;
+  // Parallax translation for floating frame (GPU accelerated translate3d)
+  const parallaxOffsetY = scrollY * 0.12;
 
   const handleScrollCueClick = () => {
     if (onNavigate) {
@@ -117,172 +130,207 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ scrollY, onNavigate })
     } else {
       const workEl = document.getElementById('work');
       if (workEl) {
-        workEl.scrollIntoView({ behavior: 'smooth' });
+        const offset10vh = window.innerHeight * 0.1;
+        const targetY = Math.max(0, workEl.offsetTop - offset10vh);
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
       }
     }
   };
-
-  // The non-linear gradient alpha mask:
-  // Top 0-20% is highly transparent for cosmic nebula & 3D stars,
-  // 35-55% blends watercolor halo into nebula,
-  // 70-100% renders tulips fully opaque solid colors.
-  const zenithMaskGradient =
-    'linear-gradient(to bottom, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.18) 18%, rgba(0,0,0,0.52) 36%, rgba(0,0,0,0.88) 56%, #000 72%, #000 100%)';
 
   return (
     <section
       id="home"
       ref={sectionRef}
-      className="relative w-screen h-screen overflow-hidden box-border select-none"
+      className="relative w-full h-screen overflow-hidden box-border select-none flex items-center justify-center bg-[#ebe8e1]"
       aria-label="Hero section — Rocky Babcock"
     >
       {/* ─────────────────────────────────────────────────────────────
-          LAYER 1: LOWER-MID LAYER — DYNAMIC NEBULAE & ENERGY FIELDS
-          Inverted 180° blackhole fluid video extending from viewport zenith
-          with mix-blend-screen (70-85% opacity) & purple-ultramarine radial glow
+          LAYER 1: FULL-SCREEN BOTANICAL WATERCOLOR ARTWORK (home-back.jpg)
+          The watercolor tulip garden and blue watercolor sky fill the entire
+          canvas, establishing the light, artistic museum atmosphere.
          ───────────────────────────────────────────────────────────── */}
       <div
-        className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden select-none z-[1]"
-        aria-hidden="true"
-      >
-        {/* Blackhole video inverted 180° to project downward from zenith */}
-        <div className="absolute -top-[160px] sm:-top-[220px] md:-top-[260px] left-1/2 -translate-x-1/2 w-[140vw] sm:w-[125vw] max-w-[1700px] h-[105vh] sm:h-[120vh] rotate-180 mix-blend-screen opacity-80 pointer-events-none overflow-hidden">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover select-none pointer-events-none"
-            src="/videos/blackhole.webm"
-          />
-        </div>
-
-        {/* Radial gradient glow blending deep purple and ultramarine */}
-        <div
-          className="absolute inset-0 w-full h-full pointer-events-none mix-blend-screen"
-          style={{
-            background:
-              'radial-gradient(ellipse 70% 55% at 50% 12%, rgba(147, 51, 234, 0.55) 0%, rgba(79, 70, 229, 0.35) 30%, transparent 75%)',
-          }}
-        />
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────────
-          LAYER 2: MIDDLE LAYER — WATERCOLOR ART FOREGROUND
-          Main watercolor artwork with subtle parallax and key masking constraint
-          allowing zenith transparency so the nebula & starfield show through
-         ───────────────────────────────────────────────────────────── */}
-      <div
-        className="absolute inset-0 w-full h-full pointer-events-none select-none z-[2] overflow-hidden"
+        className="absolute inset-0 w-full h-full pointer-events-none select-none z-[1] overflow-hidden"
         style={{
-          maskImage: zenithMaskGradient,
-          WebkitMaskImage: zenithMaskGradient,
           transform: `translate3d(0, ${parallaxOffsetY}px, 0)`,
           willChange: 'transform',
         }}
         aria-hidden="true"
       >
-        {/* Subtle skeleton shimmer while image loads */}
-        {!imageLoaded && (
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-[#030014]/30 via-purple-950/20 to-indigo-950/40 animate-pulse" />
-        )}
-
         <img
           src="/assets/imgs/home-back.jpg"
-          alt="Rocky Babcock watercolor tulip garden with rainbow halo"
+          alt="Rocky Babcock watercolor tulip garden"
           draggable={false}
           onLoad={() => setImageLoaded(true)}
-          className={`w-full h-full object-cover object-bottom sm:object-center select-none transition-opacity duration-1000 ${
+          className={`w-full h-full object-cover object-center select-none transition-opacity duration-700 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
         />
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          LAYER 3: TOP LAYER — MUSAB HASSAN-STYLE TYPOGRAPHY
-          Display Serif title in pure white with tight kerning,
-          interwoven handwritten signature PNG overlapping the surname,
-          drop-shadow contrast protection, centered occupation & ↓ SCROLL
+          LAYER 2: CELESTIAL PURPLE NEBULA & BLACK HOLE ACCRETION PORTAL
+          Refined in direct response to user requirements:
+          1. '紫色星云亮度略微低一点': Softened luminance, ethereal opacity (~75%),
+             and balanced contrast to integrate harmoniously with the watercolor sky.
+          2. '同时向上升高位置': Elevated into the upper sky above 'rocky', so the
+             concentric rainbow arc, horizon flare, and black hole crown the typography
+             without smothering the text letters.
          ───────────────────────────────────────────────────────────── */}
-      <div className="relative z-10 w-full h-full flex flex-col justify-center items-center pt-[14vh] sm:pt-[16vh] pb-[6vh] sm:pb-[8vh] px-4 pointer-events-none box-border">
-        <div className="flex flex-col items-center justify-center text-center pointer-events-auto max-w-full">
-          {/* Main Title Block */}
+      <div
+        className="absolute left-1/2 pointer-events-none select-none z-[2] flex flex-col items-center justify-center overflow-visible mix-blend-screen"
+        style={{
+          top: '22%',
+          transform: 'translate(-50%, -50%)',
+          width: 'clamp(340px, 52vw, 680px)',
+          height: 'clamp(260px, 40vw, 500px)',
+        }}
+        aria-hidden="true"
+      >
+        {/* Soft Ambient Cosmic Purple Halo with lowered brightness */}
+        <div
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(168, 85, 247, 0.22) 0%, rgba(126, 34, 206, 0.12) 44%, rgba(79, 70, 229, 0.04) 68%, transparent 88%)',
+            filter: 'blur(32px)',
+          }}
+        />
+
+        {/* Black Hole Upright Video masked in celestial arched portal */}
+        <div
+          className="relative w-full h-full flex items-center justify-center overflow-hidden"
+          style={{
+            maskImage:
+              'radial-gradient(ellipse 90% 82% at 50% 52%, black 48%, rgba(0,0,0,0.6) 72%, transparent 100%)',
+            WebkitMaskImage:
+              'radial-gradient(ellipse 90% 82% at 50% 52%, black 48%, rgba(0,0,0,0.6) 72%, transparent 100%)',
+          }}
+        >
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-[125%] h-[125%] max-w-none object-cover select-none pointer-events-none opacity-75"
+            style={{
+              objectPosition: 'center 46%',
+              filter: 'brightness(0.86) contrast(1.12)',
+            }}
+            src="/videos/blackhole.webm"
+          />
+        </div>
+
+        {/* Luminous horizontal radiant lens flare beam across the black hole horizon */}
+        <div
+          className="absolute w-[180%] max-w-[1400px] h-[2px] sm:h-[3px] pointer-events-none"
+          style={{
+            left: '50%',
+            top: '51%',
+            transform: 'translate(-50%, -50%)',
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(168, 85, 247, 0.12) 15%, rgba(216, 180, 254, 0.72) 36%, rgba(255, 255, 255, 0.92) 50%, rgba(216, 180, 254, 0.72) 64%, rgba(168, 85, 247, 0.12) 85%, transparent 100%)',
+            boxShadow:
+              '0 0 14px 3px rgba(168, 85, 247, 0.38), 0 0 32px 8px rgba(129, 140, 248, 0.2)',
+          }}
+        />
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          LAYER 3: FOREGROUND TYPOGRAPHIC LOCKUP (MUSAB HASSAN EDITORIAL)
+          Balanced composition:
+          - 'rocky' and 'babcock' display serif centered below the celestial crown.
+          - Handwritten signature positioned with artistic breathing room to the
+            upper-left flank of 'rocky', clearing the 'babcock' letters.
+          - Occupation tagline and interactive '↓ SCROLL' cue aligned cleanly below.
+         ───────────────────────────────────────────────────────────── */}
+      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-4 sm:px-8 pointer-events-none box-border pt-12 sm:pt-16 pb-4">
+        {/* Core title and signature cluster */}
+        <div className="relative flex flex-col items-center pointer-events-auto">
+          {/* Handcrafted white signature placed to upper-left flank with artistic breathing room */}
+          <div className="absolute -left-[24vw] sm:-left-[190px] md:-left-[250px] lg:-left-[290px] top-[2%] sm:top-[4%] md:top-[6%] pointer-events-none z-20">
+            <img
+              ref={signatureRef}
+              src="/assets/imgs/signature-white.png"
+              alt="Rocky Babcock handwritten signature"
+              draggable={false}
+              className="w-[40vw] sm:w-[28vw] md:w-[22vw] max-w-[280px] min-w-[155px] h-auto object-contain select-none will-change-transform"
+              style={{
+                filter:
+                  'drop-shadow(0 3px 14px rgba(0, 0, 0, 0.55)) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.75))',
+              }}
+            />
+          </div>
+
+          {/* Editorial Display Title Block */}
           <h1
-            className="flex flex-col items-start text-left m-0 p-0 font-normal select-none"
+            className="flex flex-col items-center m-0 p-0 font-normal select-none"
             style={{
               fontFamily: 'var(--title-font)',
-              filter: 'drop-shadow(0 4px 24px rgba(0, 0, 0, 0.65))',
+              filter:
+                'drop-shadow(0 4px 20px rgba(0, 0, 0, 0.55)) drop-shadow(0 1px 4px rgba(0, 0, 0, 0.75))',
             }}
           >
-            {/* First Line: rocky */}
+            {/* First Word: rocky */}
             <div className="overflow-hidden inline-flex pb-1">
               <span
                 ref={word1Ref}
                 className="inline-block text-white lowercase will-change-transform"
                 style={{
-                  fontSize: 'clamp(3.8rem, 12vw, 11.5rem)',
+                  fontSize: 'clamp(4.2rem, 11vw, 9.4rem)',
                   lineHeight: 0.86,
-                  letterSpacing: '-0.04em',
+                  letterSpacing: '-0.035em',
+                  fontFamily: 'var(--title-font)',
                 }}
               >
                 rocky
               </span>
             </div>
 
-            {/* Second Line: handwritten signature + babcock */}
-            <div className="relative inline-flex items-baseline overflow-visible">
-              {/* Authentic handwritten white signature PNG overlapping the surname */}
-              <img
-                ref={signatureRef}
-                src="/assets/imgs/signature-white.png"
-                alt="Rocky Babcock handwritten signature"
-                draggable={false}
-                className="absolute right-[82%] sm:right-[85%] md:right-[88%] top-[45%] -translate-y-1/2 w-[34vw] max-w-[270px] min-w-[125px] pointer-events-none select-none z-20"
+            {/* Second Word: babcock */}
+            <div className="overflow-hidden inline-flex pb-1">
+              <span
+                ref={word2Ref}
+                className="inline-block text-white lowercase will-change-transform"
                 style={{
-                  filter: 'drop-shadow(0 2px 14px rgba(0, 0, 0, 0.7))',
+                  fontSize: 'clamp(4.2rem, 11vw, 9.4rem)',
+                  lineHeight: 0.86,
+                  letterSpacing: '-0.035em',
+                  fontFamily: 'var(--title-font)',
                 }}
-              />
-
-              <div className="overflow-hidden inline-flex pb-1">
-                <span
-                  ref={word2Ref}
-                  className="inline-block text-white lowercase will-change-transform relative z-10"
-                  style={{
-                    fontSize: 'clamp(3.8rem, 12vw, 11.5rem)',
-                    lineHeight: 0.86,
-                    letterSpacing: '-0.04em',
-                  }}
-                >
-                  babcock
-                </span>
-              </div>
+              >
+                babcock
+              </span>
             </div>
           </h1>
 
-          {/* Minimalist Sub-Headline (Monospaced, clean letterspacing) */}
-          <div className="w-full text-center mt-[3vh] sm:mt-[4vh] overflow-hidden">
+          {/* Minimalist Occupation Tagline */}
+          <div className="overflow-hidden mt-4 sm:mt-5 md:mt-6">
             <p
               ref={occRef}
-              className="m-0 font-mono text-xs sm:text-sm md:text-base text-white/90 tracking-[0.14em] font-light lowercase will-change-transform"
+              className="m-0 text-xs sm:text-sm md:text-base text-white/95 tracking-[0.14em] font-normal lowercase text-center will-change-transform"
               style={{
-                filter: 'drop-shadow(0 2px 12px rgba(0, 0, 0, 0.75))',
+                fontFamily: 'var(--body-font)',
+                filter:
+                  'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.65)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85))',
               }}
             >
-              creative technologist & frontend developer
+              creative technologist &amp; frontend developer
             </p>
           </div>
 
-          {/* Interactive ↓ SCROLL anchor button with hover motion */}
-          <div className="w-full flex justify-center mt-[2.5vh] sm:mt-[3.2vh] overflow-hidden">
+          {/* Interactive '↓ SCROLL' Action Cue */}
+          <div className="overflow-hidden mt-3 sm:mt-4 md:mt-5">
             <button
               ref={scrollCtaRef}
               type="button"
               onClick={handleScrollCueClick}
-              className="group font-mono text-xs sm:text-sm tracking-[0.28em] uppercase text-white/85 hover:text-white flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 py-2 px-3 border-none bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/50 rounded clickable will-change-transform"
-              aria-label="Scroll down to projects"
+              className="group font-mono text-xs sm:text-sm tracking-[0.28em] uppercase text-white/90 hover:text-white flex items-center gap-2 cursor-pointer transition-all duration-300 py-2 px-4 border-none bg-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/50 rounded clickable will-change-transform"
+              aria-label="Scroll down to studio projects"
               style={{
-                filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.65))',
+                filter:
+                  'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.65)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85))',
               }}
             >
               <span className="inline-block transition-transform duration-300 group-hover:translate-y-1 text-sm sm:text-base font-normal">
@@ -296,3 +344,4 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ scrollY, onNavigate })
     </section>
   );
 };
+
