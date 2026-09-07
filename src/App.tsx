@@ -115,7 +115,9 @@ export default function App() {
       });
       return;
     }
-    const targetEl = document.getElementById(targetId);
+    const resolvedId =
+      targetId === 'studio' ? 'work' : targetId === 'contact' ? 'footer' : targetId;
+    const targetEl = document.getElementById(resolvedId);
     if (targetEl) {
       scrollFrameRef.current.scrollTo({
         top: targetEl.offsetTop - window.innerHeight * 0.08,

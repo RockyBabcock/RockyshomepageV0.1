@@ -1,7 +1,6 @@
-@import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Questrial&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 @import url('https://use.typekit.net/goc4cow.css');
+@import "tailwindcss";
 
 :root {
   --c-light: #F4F6F8;

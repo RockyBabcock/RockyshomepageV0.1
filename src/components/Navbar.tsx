@@ -45,14 +45,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
 
       {/* Desktop & Mobile Menu */}
       <div className="flex items-center pointer-events-auto">
-        {/* Desktop Menu - Refined typography to avoid header collisions */}
+        {/* Desktop Menu - Refined typography matching the digital museum aesthetic */}
         <ul className="hidden md:flex list-none mix-blend-exclusion overflow-hidden m-0 p-0 items-center gap-1">
           <li className="font-mono uppercase text-xs tracking-[0.2em] inline-flex items-center">
             <button
               onClick={() => handleNavClick('home')}
               className="border-none bg-transparent text-white/90 uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable hover:text-white transition-colors"
             >
-              Home
+              HOME
             </button>
             <span className="mx-2 text-white/40">·</span>
           </li>
@@ -61,7 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
               onClick={() => handleNavClick('work')}
               className="border-none bg-transparent text-white/90 uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable hover:text-white transition-colors"
             >
-              Work
+              STUDIO
             </button>
             <span className="mx-2 text-white/40">·</span>
           </li>
@@ -70,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
               onClick={() => handleNavClick('skills')}
               className="border-none bg-transparent text-white/90 uppercase font-inherit text-inherit tracking-inherit cursor-pointer clickable hover:text-white transition-colors"
             >
-              Skills
+              SKILLS
             </button>
             <span className="mx-2 text-white/40">·</span>
           </li>
@@ -79,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
               href="mailto:holmepavolini@gmail.com"
               className="text-white/90 uppercase font-inherit text-inherit tracking-inherit no-underline clickable hover:text-white transition-colors"
             >
-              Contact
+              CONTACT
             </a>
             <span className="mx-2 text-white/40">·</span>
           </li>
@@ -90,7 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
               rel="noreferrer"
               className="text-white/90 uppercase font-inherit text-inherit tracking-inherit no-underline clickable hover:text-white transition-colors"
             >
-              Github
+              GIT
             </a>
           </li>
         </ul>
@@ -143,7 +143,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
               onClick={() => handleNavClick('work')}
               className="border-none bg-transparent text-white font-inherit text-inherit cursor-pointer text-left w-full clickable"
             >
-              work
+              studio
             </button>
           </li>
           <li className="font-[family-name:var(--body-font)] font-bold lowercase text-[9vw] py-[2vh] border-b border-white/30">
@@ -169,7 +169,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
               rel="noreferrer"
               className="text-white no-underline font-inherit text-inherit block w-full clickable"
             >
-              github
+              git
             </a>
           </li>
         </ul>
